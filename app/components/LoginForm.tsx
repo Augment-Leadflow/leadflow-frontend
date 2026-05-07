@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import "./LoginForm.css";
+import Link from "next/link";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -21,6 +22,7 @@ export default function LoginForm() {
       setError("Please fill all fields");
       return;
     }
+
 
     setLoading(true);
     setError("");
@@ -102,12 +104,16 @@ export default function LoginForm() {
         {loading ? "Loading..." : "Login"}
       </button>
 
-      <p className="footer-text">
-        Don’t have an account?{" "}
-        <span className="signup-link">
-          Sign Up
-        </span>
-      </p>
+     <p className="text-center mt-5 text-gray-500 text-sm">
+  Don’t have an account?{" "}
+
+  <Link
+    href="/signup"
+    className="text-blue-600 hover:underline"
+  >
+    Sign Up
+  </Link>
+</p>
 
     </form>
   </div>
