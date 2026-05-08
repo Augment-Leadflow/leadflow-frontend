@@ -3,8 +3,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 const INITIAL_DATA = [
-    { id: 1, name: "Mahak Jaiswal", phone: "98267xxxxx",email: "mahak123@gmail.com", source: "Google", status: "NEW", notes: "New User!!", createdAt: "2026-05-01" },
-    { id: 2, name: "Ishika Kag", phone: "91234xxxxx",email: "ishika123@gmail.com", source: "LinkedIn", status: "CONVERTED", notes: "Ready for onboarding", createdAt: "2026-04-20" },
+    { id: 1, name: "Mahak Jaiswal", phone: "98267xxxxx", source: "Google", status: "NEW", notes: "Core Java focus", createdAt: "2026-05-01" },
+    { id: 2, name: "Sarthak Dev", phone: "91234xxxxx", source: "LinkedIn", status: "CONVERTED", notes: "Ready for onboarding", createdAt: "2026-04-20" },
 ];
 
 export default function DashboardPage() {
@@ -16,7 +16,7 @@ export default function DashboardPage() {
     // Modal & Form State
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
-    const [formData, setFormData] = useState({ id: null, name: '', phone: '',email: '', source: '', status: 'NEW', notes: '', createdAt: '' });
+    const [formData, setFormData] = useState({ id: null, name: '', phone: '', source: '', status: 'NEW', notes: '', createdAt: '' });
 
     const filteredLeads = leads.filter(l => 
         (filter === 'ALL' || l.status === filter) &&
@@ -25,7 +25,7 @@ export default function DashboardPage() {
 
     // --- FUNCTIONS ---
     const handleOpenCreate = () => {
-        setFormData({ id: null, name: '', phone: '',email: '', source: '', status: 'NEW', notes: '', createdAt: '' });
+        setFormData({ id: null, name: '', phone: '', source: '', status: 'NEW', notes: '', createdAt: '' });
         setIsEditing(false);
         setIsModalOpen(true);
     };
@@ -103,14 +103,14 @@ export default function DashboardPage() {
                              <thead className="bg-gray-50/50 border-b">
                                 <tr className="text-gray-400 text-[10px] uppercase font-black tracking-widest text-center">
                                     <th className="p-5 text-left">Name</th>
-                                    <th className="p-5">Phone</th><th className="p-5">Email</th><th>Source</th><th>Status</th><th>Notes</th><th>Created At</th><th className="p-5">Actions</th>
+                                    <th className="p-5">Phone</th><th>Source</th><th>Status</th><th>Notes</th><th>Created At</th><th className="p-5">Actions</th>
                                 </tr>
                             </thead> 
                            
                             <tbody className="text-sm">
   {filteredLeads.map((l) => (
     <tr key={l.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors text-center">
-      <td className="p-5 font-bold text-gray-700 text-left">{l.name}</td><td className="p-5 text-gray-500">{l.phone}</td><td className="p-5 text-gray-500">{l.email}</td><td className="p-5 text-gray-500">{l.source}</td><td className="p-5"><span className={`px-3 py-1 rounded-full text-[10px] font-black ${l.status === 'NEW' ? 'bg-blue-100 text-blue-600' : l.status === 'CONVERTED' ? 'bg-green-100 text-green-600' : 'bg-gray-100'}`}>{l.status}</span></td><td className="p-5 text-gray-400 italic truncate max-w-[120px]">{l.notes}</td><td className="p-5 text-gray-500 text-xs">{l.createdAt}</td><td className="p-5 font-bold text-xs"><button onClick={() => handleOpenEdit(l)} className="text-blue-500 mr-4 hover:underline">EDIT</button><button onClick={() => handleDelete(l.id)} className="text-red-400 hover:underline">DELETE</button></td>
+      <td className="p-5 font-bold text-gray-700 text-left">{l.name}</td><td className="p-5 text-gray-500">{l.phone}</td><td className="p-5 text-gray-500">{l.source}</td><td className="p-5"><span className={`px-3 py-1 rounded-full text-[10px] font-black ${l.status === 'NEW' ? 'bg-blue-100 text-blue-600' : l.status === 'CONVERTED' ? 'bg-green-100 text-green-600' : 'bg-gray-100'}`}>{l.status}</span></td><td className="p-5 text-gray-400 italic truncate max-w-[120px]">{l.notes}</td><td className="p-5 text-gray-500 text-xs">{l.createdAt}</td><td className="p-5 font-bold text-xs"><button onClick={() => handleOpenEdit(l)} className="text-blue-500 mr-4 hover:underline">EDIT</button><button onClick={() => handleDelete(l.id)} className="text-red-400 hover:underline">DELETE</button></td>
     </tr>
   ))}
 </tbody>
@@ -127,7 +127,6 @@ export default function DashboardPage() {
                         <form onSubmit={handleSave} className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <input type="text" placeholder="Name" required className="p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
-                                <input type="email" placeholder="Email Address" className="p-3 border rounded-xl outline-none" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})}/>
                                 <input type="text" placeholder="Phone" required className="p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
