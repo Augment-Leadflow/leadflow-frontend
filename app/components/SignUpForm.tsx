@@ -3,9 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import "./LoginForm.css";
 
 
 export default function SignUpForm() {
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -27,6 +31,7 @@ export default function SignUpForm() {
 
   // Email validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  
 
   if (!emailRegex.test(email)) {
     setError("Please enter a valid email");
@@ -34,7 +39,8 @@ export default function SignUpForm() {
   }
 
   // Phone validation (10 digits)
-  const phoneRegex = /^[0-9]{10}$/;
+  //const phoneRegex = /^[0-9]{10}$/;
+  const phoneRegex = /^\+\d{10,15}$/;
 
   if (!phoneRegex.test(phone)) {
     setError("Please enter a valid 10-digit phone number");
@@ -42,7 +48,7 @@ export default function SignUpForm() {
   }
 
   // Password length validation
-  if (password.length < 6) {
+  if (password.length < 8) {
     setError("Password must be at least 6 characters");
     return;
   }
@@ -56,7 +62,7 @@ export default function SignUpForm() {
   try {
   setLoading(true);
 
-  const res = await fetch("http://localhost:8080/api/auth/signup", {
+  const res = await fetch("http://localhost:8080/api/auth/register", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -92,8 +98,9 @@ export default function SignUpForm() {
   throw new Error("Signup failed");
 }
 
-localStorage.setItem("token", data.token);
-router.push("/dashboard");
+//localStorage.setItem("token", data.token); 
+//router.push("/dashboard");
+router.push("/login");
 
 console.log("Signup Success", data);
 
@@ -149,33 +156,57 @@ console.log("Signup Success", data);
 
       {/* Password */}
       <div className="mb-5">
-        <label className="block mb-2 font-medium text-gray-700">
-          Password
-        </label>
+  <label className="block mb-2 font-medium text-gray-700">
+    Password
+  </label>
 
-        <input
-          type="password"
-          placeholder="Enter your password"
-          className="w-full p-3 border border-gray-300 rounded-lg outline-none focus:border-blue-600"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
+  <div className="relative">
+
+    <input
+      type={showPassword ? "text" : "password"}
+      placeholder="Enter your password"
+      className="w-full p-3 border border-gray-300 rounded-lg outline-none focus:border-blue-600"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+    />
+
+    <button
+      type="button"
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+      onClick={() => setShowPassword(!showPassword)}
+    >
+      {showPassword ? <FaEyeSlash /> : <FaEye />}
+    </button>
+
+  </div>
+</div>
 
       {/* Confirm Password */}
       <div className="mb-5">
-        <label className="block mb-2 font-medium text-gray-700">
-          Confirm Password
-        </label>
+  <label className="block mb-2 font-medium text-gray-700">
+    Password
+  </label>
 
-        <input
-          type="password"
-          placeholder="Confirm your password"
-          className="w-full p-3 border border-gray-300 rounded-lg outline-none focus:border-blue-600"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-        />
-      </div>
+  <div className="relative">
+
+    <input
+      type={showPassword ? "text" : "password"}
+      placeholder="Enter your password"
+      className="w-full p-3 border border-gray-300 rounded-lg outline-none focus:border-blue-600"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+    />
+
+    <button
+      type="button"
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+      onClick={() => setShowPassword(!showPassword)}
+    >
+      {showPassword ? <FaEyeSlash /> : <FaEye />}
+    </button>
+
+  </div>
+</div>
 
       {error && (
   <p className="text-red-500 text-sm text-center mb-4">

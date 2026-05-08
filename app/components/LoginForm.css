@@ -87,3 +87,18 @@
   color: #2563eb;
   cursor: pointer;
 }
+.password-wrapper {
+  position: relative;
+}
+
+.eye-button {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #6b7280;
+  font-size: 18px;
+}

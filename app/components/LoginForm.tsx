@@ -4,9 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import "./LoginForm.css";
 import Link from "next/link";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function LoginForm() {
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -78,17 +80,29 @@ export default function LoginForm() {
         />
       </div>
 
-      <div className="input-group">
-        <label className="input-label">Password</label>
+     <div className="input-group">
+  <label className="input-label">Password</label>
 
-        <input
-          type="password"
-          placeholder="Enter your password"
-          className="login-input"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
+  <div className="password-wrapper">
+
+    <input
+      type={showPassword ? "text" : "password"}
+      placeholder="Enter your password"
+      className="login-input"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+    />
+
+    <button
+      type="button"
+      className="eye-button"
+      onClick={() => setShowPassword(!showPassword)}
+    >
+      {showPassword ? <FaEyeSlash /> : <FaEye />}
+    </button>
+
+  </div>
+</div>
 
       {error && (
         <p className="error-message">
