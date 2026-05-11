@@ -65,7 +65,7 @@ export default function LoginForm() {
       <h2 className="login-title">Welcome Back</h2>
 
       <p className="login-subtitle">
-        Login to your account
+        Login to LeadFlow account
       </p>
 
       <div className="input-group">
@@ -125,7 +125,7 @@ export default function LoginForm() {
     href="/signup"
     className="text-blue-600 hover:underline"
   >
-    Sign Up
+    Register
   </Link>
 </p>
 
