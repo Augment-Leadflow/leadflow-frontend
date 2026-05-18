@@ -5,11 +5,11 @@ import Link from "next/link";
 import { Menu, X, LogIn, UserPlus } from "lucide-react";
 
 const navLinks = [
-  { label: "Home", href: "#" },
+  { label: "Home", href: "#home" },
   { label: "Features", href: "#features" },
-  { label: "Solutions", href: "#solutions" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "About", href: "#about" },
+  { label: "About Us", href: "#about" },
+  
+  { label: "Contact", href: "#contact" },
 ];
 
 export function Header() {
@@ -55,82 +55,87 @@ export function Header() {
 
   return (
     <>
-      {/* Top Bar */}
-      <div className={`hidden md:block transition-all duration-500 ${scrolled ? "bg-slate-900/95 backdrop-blur-md" : "bg-gradient-to-r from-indigo-600 to-purple-600"} text-white text-sm`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-9">
-            <div className="flex items-center gap-6">
-              <span className="text-xs opacity-90">✓ 50,000+ businesses worldwide</span>
-            </div>
-            <div className="text-xs opacity-80">
-              <a href="tel:+15551234567" className="hover:underline">+1 (555) 123-4567</a> | 
-              <a href="mailto:hello@leadflow.com" className="hover:underline ml-2">hello@leadflow.com</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Navigation */}
-      <nav className={`sticky top-0 z-50 transition-all duration-500 ${scrolled ? "bg-slate-900/95 backdrop-blur-md shadow-lg border-b border-slate-700/50" : "bg-white/80 shadow-sm"} backdrop-blur-sm`}>
+      <nav className={`sticky top-0 z-50 transition-all duration-500 ${
+        scrolled 
+          ? "bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600 shadow-2xl border-b border-white/10" 
+          : "bg-white shadow-sm"
+      }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                  <path d="M2 17l10 5 10-5"/>
-                  <path d="M2 12l10 5 10-5"/>
+            
+            {/* ── Left Side: Brand Logo ── */}
+            <Link href="/" className="flex items-center gap-2.5 flex-shrink-0 group">
+              <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:rotate-12 transition-transform duration-300">
+                <svg className="w-5 h-5 text-slate-950" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
                 </svg>
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Leadflow</span>
+              <span className={`text-2xl font-black tracking-tight transition-colors duration-300 ${
+                scrolled ? "text-white" : "bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 bg-clip-text text-transparent"
+              }`}>
+                Leadflow
+              </span>
             </Link>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-8">
-              {navLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  onClick={(e) => handleSmoothNavigation(e, link.href)}
-                  className="text-slate-600 hover:text-indigo-600 font-medium transition-colors duration-300"
+            {/* ── Right Side: Navigation Links & Auth Actions ── */}
+            <div className="hidden md:flex items-center gap-8 ml-auto">
+              {/* Main Content Links */}
+              <div className="flex items-center gap-7">
+                {navLinks.map((link) => (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    onClick={(e) => handleSmoothNavigation(e, link.href)}
+                    className={`font-semibold text-sm transition-colors duration-200 ${
+                      scrolled ? "text-indigo-100 hover:text-white" : "text-slate-600 hover:text-indigo-600"
+                    }`}
+                  >
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+
+              {/* Desktop Authentication Controls */}
+              <div className="flex items-center gap-3 border-l pl-6 border-slate-200/60">
+                <Link
+                  href="/login"
+                  className={`flex items-center gap-1.5 px-4 py-2 font-bold rounded-xl border-2 transition-all duration-200 text-xs hover:-translate-y-0.5 ${
+                    scrolled
+                      ? "border-white/10 text-white hover:bg-white/10 hover:border-white/30"
+                      : "border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300"
+                  }`}
                 >
-                  {link.label}
-                </a>
-              ))}
+                  <LogIn className="w-3.5 h-3.5" />
+                  Log In
+                </Link>
+                <Link
+                  href="/register"
+                  className="flex items-center gap-1.5 px-4 py-2 text-white font-bold bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 text-xs"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  Sign Up
+                </Link>
+              </div>
             </div>
 
-            {/* Desktop Auth Buttons */}
-            <div className="hidden md:flex items-center gap-4">
-              <Link
-                href="/login"
-                className="flex items-center gap-2 px-4 py-2 text-slate-600 hover:text-indigo-600 font-medium transition-all duration-300 hover:bg-slate-50 rounded-lg"
-              >
-                <LogIn className="w-4 h-4" />
-                Sign In
-              </Link>
-              <Link
-                href="/register"
-                className="flex items-center gap-2 px-5 py-2 text-white font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 text-sm"
-              >
-                <UserPlus className="w-4 h-4" />
-                Register Now
-              </Link>
-            </div>
-
-            {/* Mobile Menu Button */}
+            {/* Mobile Hamburger Button */}
             <button
+              type="button"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg"
+              className={`md:hidden p-2 rounded-xl transition-colors ${
+                scrolled ? "text-white hover:bg-white/10" : "text-slate-600 hover:bg-slate-100"
+              }`}
             >
-              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
 
-          {/* Mobile Navigation */}
+          {/* ── Mobile Navigation Drawer ── */}
           {isMenuOpen && (
-            <div className="md:hidden py-4 border-t border-slate-200 animate-slide-in bg-white/95 backdrop-blur-sm">
-              <div className="flex flex-col gap-3">
+            <div className={`md:hidden py-4 border-t animate-fade-in ${
+              scrolled ? "border-white/10 bg-slate-900/95" : "border-slate-100 bg-white"
+            }`}>
+              <div className="flex flex-col gap-1.5 px-2">
                 {navLinks.map((link) => (
                   <a
                     key={link.label}
@@ -139,25 +144,36 @@ export function Header() {
                       handleSmoothNavigation(e, link.href);
                       closeMenu();
                     }}
-                    className="px-4 py-3 text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg transition-colors"
+                    className={`px-4 py-3 rounded-xl transition-colors font-semibold text-sm ${
+                      scrolled 
+                        ? "text-slate-300 hover:text-white hover:bg-white/5" 
+                        : "text-slate-600 hover:text-indigo-600 hover:bg-slate-50"
+                    }`}
                   >
                     {link.label}
                   </a>
                 ))}
-                <div className="pt-4 border-t border-slate-200 flex flex-col gap-3">
+                
+                <div className={`pt-4 mt-2 border-t flex flex-col gap-2.5 ${
+                  scrolled ? "border-white/10" : "border-slate-100"
+                }`}>
                   <Link
                     href="/login"
-                    className="flex items-center gap-2 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-lg"
                     onClick={closeMenu}
+                    className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 font-bold text-sm ${
+                      scrolled ? "border-white/20 text-white hover:bg-white/5" : "border-slate-200 text-slate-700 hover:bg-slate-50"
+                    }`}
                   >
-                    Sign In
+                    <LogIn className="w-4 h-4" />
+                    <span>Log In</span>
                   </Link>
                   <Link
                     href="/register"
-                    className="flex items-center justify-center gap-2 px-4 py-3 text-white font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg"
                     onClick={closeMenu}
+                    className="flex items-center justify-center gap-2 px-4 py-3 text-white font-bold bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-lg text-sm"
                   >
-                    Register Now
+                    <UserPlus className="w-4 h-4" />
+                    <span>Sign Up</span>
                   </Link>
                 </div>
               </div>

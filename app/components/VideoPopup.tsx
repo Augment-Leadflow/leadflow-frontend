@@ -5,10 +5,10 @@ import { PlayCircle, X } from "lucide-react";
 
 interface VideoPopupProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
-export function VideoPopup({ isOpen, onClose }: VideoPopupProps) {
+export default function VideoPopup({ isOpen, onClose }: VideoPopupProps) {
   if (!isOpen) return null;
 
   return (
@@ -23,6 +23,7 @@ export function VideoPopup({ isOpen, onClose }: VideoPopupProps) {
       <div className="relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden animate-fade-in">
         {/* Close Button */}
         <button
+          type="button"
           onClick={onClose}
           className="absolute top-4 right-4 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-110"
           aria-label="Close popup"
