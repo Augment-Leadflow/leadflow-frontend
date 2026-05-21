@@ -804,7 +804,6 @@ export default function DashboardPage() {
               <h3 className="text-lg font-bold text-slate-900">Delete Lead Profile?</h3>
               <p className="text-xs text-slate-500 mt-2 leading-relaxed">Are you sure you want to delete <span className="font-semibold text-slate-800">{leadToDelete.name}</span>? This operational path cannot be undone.</p>
             </div>
-
             <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex gap-3">
               <button type="button" disabled={isDeleting} onClick={() => { setIsDeleteModalOpen(false); setLeadToDelete(null); }} className="flex-1 py-2.5 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors hover:bg-slate-100 disabled:opacity-50">Cancel</button>
               <button type="button" disabled={isDeleting} onClick={confirmDeleteLead} className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs shadow-md shadow-rose-600/20 transition-all flex items-center justify-center gap-1.5 disabled:opacity-50">
