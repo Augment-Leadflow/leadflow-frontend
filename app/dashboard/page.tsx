@@ -111,6 +111,9 @@ export default function DashboardPage() {
   const [notesTab, setNotesTab] = useState<'view' | 'add'>('view');
   const [noteForm, setNoteForm] = useState({ id: null as number | null, content: '' });
 
+  // Field-specific error state for Create/Edit Lead Form
+  const [formFieldErrors, setFormFieldErrors] = useState({ name: '', email: '', phone: '' });
+
   const [toast, setToast] = useState<{
     show: boolean;
     title: string;
@@ -200,6 +203,7 @@ export default function DashboardPage() {
 
   const openCreate = () => {
     setFormData({ ...EMPTY_FORM });
+    setFormFieldErrors({ name: '', email: '', phone: '' }); 
     setIsEditing(false);
     setModal(true);
   };
@@ -215,6 +219,7 @@ export default function DashboardPage() {
       notes: lead.notes,
       createdAt: lead.createdAt ?? ''
     });
+    setFormFieldErrors({ name: '', email: '', phone: '' }); 
     setIsEditing(true);
     setModal(true);
   };
@@ -230,21 +235,72 @@ export default function DashboardPage() {
     setIsDeleteModalOpen(true);
   };
 
-  const handleSave = async () => {
-    const name = formData.name?.trim() ?? '';
-    const email = formData.email?.trim() ?? '';
-    const phone = formData.phone?.trim() ?? '';
+  const validateLeadForm = () => {
+    let isValid = true;
+    const errors = { name: '', email: '', phone: '' };
 
-    if (!name || !email || !phone) {
-      showToast('Validation Failed', 'Please input all required values.', 'error');
+    if (!formData.name?.trim()) {
+      errors.name = 'Full name is required';
+      isValid = false;
+    } else if (formData.name.trim().length < 3) {
+      errors.name = 'Name must be at least 3 characters long';
+      isValid = false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email?.trim()) {
+      errors.email = 'Email address is required';
+      isValid = false;
+    } else if (!emailRegex.test(formData.email.trim())) {
+      errors.email = 'Please enter a valid email profile';
+      isValid = false;
+    }
+
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!formData.phone?.trim()) {
+      errors.phone = 'Phone number is required';
+      isValid = false;
+    } else if (!phoneRegex.test(formData.phone.trim().replace(/[\s-]/g, ''))) {
+      errors.phone = 'Please enter a valid 10-digit mobile number';
+      isValid = false;
+    }
+
+    setFormFieldErrors(errors);
+    return isValid;
+  };
+
+  const handleSave = async () => {
+    if (!validateLeadForm()) {
+      showToast('Validation Failed', 'Please fix the errors highlighted in the form.', 'error');
       return;
+    }
+
+    const inputEmail = formData.email.trim().toLowerCase();
+
+    // ── 🌟 DUPLICATE EMAIL CHECK RULES ──
+    if (!isEditing) {
+      const isDuplicate = leads.some(lead => lead.email?.trim().toLowerCase() === inputEmail);
+      if (isDuplicate) {
+        setFormFieldErrors(prev => ({ ...prev, email: 'A lead with this email address already exists.' }));
+        showToast('Duplicate Lead', 'Cannot create multiple leads with the same email.', 'error');
+        return; 
+      }
+    } else {
+      const isDuplicateOnOtherLead = leads.some(
+        lead => lead.email?.trim().toLowerCase() === inputEmail && lead.id !== formData.id
+      );
+      if (isDuplicateOnOtherLead) {
+        setFormFieldErrors(prev => ({ ...prev, email: 'This email is already taken by another lead.' }));
+        showToast('Duplicate Error', 'Email profile is already assigned to a different lead.', 'error');
+        return;
+      }
     }
       
     try {
       const leadData = {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
         source: formData.source,
         notes: formData.notes,
         status: formData.status
@@ -261,7 +317,7 @@ export default function DashboardPage() {
       fetchDashboardData();
     } catch (error) {
       console.error('Failed to save lead:', error);
-      showToast('Error', 'Failed to store configurations.', 'error');
+      showToast('Error', 'Failed to store configurations. Server mismatch.', 'error');
     }
   };
 
@@ -418,8 +474,6 @@ export default function DashboardPage() {
       </aside>
 
       <main className="flex-1 flex flex-col h-full overflow-hidden bg-white/80 backdrop-blur-md">
-        
-        {/* Banner updated to 22px font size, solid black color, and extra thick black font weights */}
         {filter === 'HOME' && (
           <div className="bg-white border-b border-slate-100 px-6 py-3.5 animate-fade-in flex-shrink-0">
             <h1 className="text-[32px] font-black text-[#4F46E5] tracking-wide uppercase">
@@ -577,6 +631,7 @@ export default function DashboardPage() {
         </div>
       </main>
 
+      {/* Notes Modal */}
       {isNotesModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
           <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
@@ -681,36 +736,94 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* ── 📊 Create / Edit Lead Modal ── */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
+          <div className="bg-white w-full max-w-md mx-4 rounded-2xl shadow-2xl overflow-hidden transform transition-all animate-fade-in border border-slate-100">
             <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
               <div>
                 <h2 className="text-lg font-bold text-slate-900">{isEditing ? 'Edit Lead' : 'Create New Lead'}</h2>
-                <p className="text-xs text-slate-500 mt-0.5">{isEditing ? 'Update lead information' : ''}</p>
+                <p className="text-xs text-slate-500 mt-0.5">{isEditing ? 'Update lead information profile' : ''}</p>
               </div>
               <button type="button" onClick={() => setModal(false)} className="p-2 hover:bg-slate-200 rounded-full text-slate-500 transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1.5">Full Name *</label>
-                <input type="text" value={formData.name || ''} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full p-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
+            <div className="p-6 space-y-3.5 max-h-[65vh] overflow-y-auto">
+              {/* Name Field Input Row */}
+              <div className="space-y-1">
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wide">Full Name *</label>
+                <input 
+                  type="text" 
+                  value={formData.name || ''} 
+                  onChange={(e) => {
+                    setFormData({ ...formData, name: e.target.value });
+                    if (formFieldErrors.name) setFormFieldErrors(prev => ({ ...prev, name: '' }));
+                  }} 
+                  className={`w-full p-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 transition-all ${
+                    formFieldErrors.name 
+                      ? 'border-rose-400 focus:ring-rose-500/20 focus:border-rose-500' 
+                      : 'border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-500/50'
+                  }`} 
+                />
+                {formFieldErrors.name && (
+                  <p className="text-[11px] text-rose-500 font-medium ml-0.5 flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                    <AlertCircle className="w-3 h-3" /> {formFieldErrors.name}
+                  </p>
+                )}
               </div>
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1.5">Email Address *</label>
-                <input type="email" value={formData.email || ''} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full p-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
+
+              {/* Email Input Row */}
+              <div className="space-y-1">
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wide">Email Address *</label>
+                <input 
+                  type="email" 
+                  value={formData.email || ''} 
+                  onChange={(e) => {
+                    setFormData({ ...formData, email: e.target.value });
+                    if (formFieldErrors.email) setFormFieldErrors(prev => ({ ...prev, email: '' }));
+                  }} 
+                  className={`w-full p-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 transition-all ${
+                    formFieldErrors.email 
+                      ? 'border-rose-400 focus:ring-rose-500/20 focus:border-rose-500' 
+                      : 'border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-500/50'
+                  }`} 
+                />
+                {formFieldErrors.email && (
+                  <p className="text-[11px] text-rose-500 font-medium ml-0.5 flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                    <AlertCircle className="w-3 h-3" /> {formFieldErrors.email}
+                  </p>
+                )}
               </div>
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1.5">Phone Number *</label>
-                <input type="tel" value={formData.phone || ''} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="w-full p-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all" />
+
+              {/* Phone Input Row */}
+              <div className="space-y-1">
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wide">Phone Number *</label>
+                <input 
+                  type="tel" 
+                  value={formData.phone || ''} 
+                  onChange={(e) => {
+                    setFormData({ ...formData, phone: e.target.value });
+                    if (formFieldErrors.phone) setFormFieldErrors(prev => ({ ...prev, phone: '' }));
+                  }} 
+                  className={`w-full p-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 transition-all ${
+                    formFieldErrors.phone 
+                      ? 'border-rose-400 focus:ring-rose-500/20 focus:border-rose-500' 
+                      : 'border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-500/50'
+                  }`} 
+                />
+                {formFieldErrors.phone && (
+                  <p className="text-[11px] text-rose-500 font-medium ml-0.5 flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                    <AlertCircle className="w-3 h-3" /> {formFieldErrors.phone}
+                  </p>
+                )}
               </div>
+
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1.5">Lead Source</label>
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Lead Source</label>
                 <div className="relative">
-                  <select value={formData.source || ''} onChange={(e) => setFormData({ ...formData, source: e.target.value })} className="w-full p-3 border border-slate-200 rounded-xl text-sm appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                  <select value={formData.source || ''} onChange={(e) => setFormData({ ...formData, source: e.target.value })} className="w-full p-2.5 border border-slate-200 rounded-xl text-sm appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all">
                     <option value="">Select source…</option>
                     {['LinkedIn', 'Google Ads', 'Referral', 'Website', 'Trade Show', 'Webinar', 'Other'].map((s) => (
                       <option key={s} value={s}>{s}</option>
@@ -719,17 +832,18 @@ export default function DashboardPage() {
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                 </div>
               </div>
+
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1.5">Status</label>
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">Status</label>
                 <div className="grid grid-cols-2 gap-2">
-                  {(['NEW', 'CONTACTED', 'CONVERTED', 'LOST'] as LeadDTO['status'][]).map((s) => {
+                  { (['NEW', 'CONTACTED', 'CONVERTED', 'LOST'] as LeadDTO['status'][]).map((s) => {
                     const cfg = STATUS_CONFIG[s];
                     return (
                       <button
                         key={s}
                         type="button"
                         onClick={() => setFormData({ ...formData, status: s })}
-                        className={`flex items-center gap-2 p-3 rounded-xl border-2 text-sm font-semibold transition-all ${formData.status === s ? `border-current ${cfg.color} ${cfg.bg}` : 'border-slate-200 text-slate-500 hover:border-slate-300'}`}
+                        className={`flex items-center justify-center p-2 rounded-xl border-2 text-xs font-bold transition-all ${formData.status === s ? `border-current ${cfg.color} ${cfg.bg}` : 'border-slate-200 text-slate-500 hover:border-slate-300'}`}
                       >
                         {cfg.label}
                       </button>
@@ -737,20 +851,22 @@ export default function DashboardPage() {
                   })}
                 </div>
               </div>
+
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1.5">Notes</label>
-                <textarea rows={3} value={formData.notes || ''} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} className="w-full p-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all resize-none" />
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Notes</label>
+                <textarea rows={2} value={formData.notes || ''} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all resize-none" />
               </div>
             </div>
 
             <div className="px-6 py-4 border-t border-slate-100 flex gap-3 bg-slate-50">
-              <button type="button" onClick={() => setModal(false)} className="flex-1 py-3 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-100 transition-colors text-sm">Cancel</button>
-              <button type="button" onClick={handleSave} className="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg text-sm">Create</button>
+              <button type="button" onClick={() => setModal(false)} className="flex-1 py-2.5 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-100 transition-colors text-xs">Cancel</button>
+              <button type="button" onClick={handleSave} className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg text-xs transition-colors">{isEditing ? 'Save Changes' : 'Create Lead'}</button>
             </div>
           </div>
         </div>
       )}
 
+      {/* Send Message Modal */}
       {isMessageModalOpen && selectedLeadForMessage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
           <form onSubmit={handleSendMessageSubmit} className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
@@ -794,15 +910,16 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* Delete Lead Confirmation Modal */}
       {isDeleteModalOpen && leadToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div className="bg-white w-full max-sm rounded-2xl shadow-2xl overflow-hidden transform transition-all animate-fade-in border border-slate-100">
+        <div className="bg-white w-full max-w-md mx-4 rounded-2xl shadow-2xl overflow-hidden transform transition-all animate-fade-in border border-slate-100">
             <div className="p-6 text-center">
               <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4 shadow-sm">
                 <AlertCircle className="w-6 h-6" />
               </div>
               <h3 className="text-lg font-bold text-slate-900">Delete Lead Profile?</h3>
-              <p className="text-xs text-slate-500 mt-2 leading-relaxed">Are you sure you want to delete <span className="font-semibold text-slate-800">{leadToDelete.name}</span>? This operational path cannot be undone.</p>
+              <p className="text-xs text-slate-500 mt-2 leading-relaxed">Are you sure you want to delete <span className="font-semibold text-slate-800">{leadToDelete.name}</span>? </p>
             </div>
             <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex gap-3">
               <button type="button" disabled={isDeleting} onClick={() => { setIsDeleteModalOpen(false); setLeadToDelete(null); }} className="flex-1 py-2.5 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors hover:bg-slate-100 disabled:opacity-50">Cancel</button>
