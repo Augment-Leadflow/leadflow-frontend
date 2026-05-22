@@ -1,0 +1,253 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  padding: 20px;
+
+  background:
+    radial-gradient(circle at top left,
+      rgba(255, 255, 255, 0.08),
+      transparent 35%),
+
+    radial-gradient(circle at bottom right,
+      rgba(255, 255, 255, 0.06),
+      transparent 35%),
+
+    linear-gradient(
+      135deg,
+      #2e1065 0%,
+      #581c87 45%,
+      #a21caf 100%
+    );
+}
+
+
+/* Glassmorphism Form */
+.login-form {
+  width: 100%;
+  max-width: 420px;
+
+  padding: 30px;
+
+  border-radius: 24px;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.35);
+
+  position: relative;
+  z-index: 10;
+}
+
+
+/* Title */
+.login-title {
+  text-align: center;
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: white;
+}
+
+
+/* Subtitle */
+.login-subtitle {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 32px;
+  font-size: 17px;
+}
+
+
+/* Input Group */
+.input-group {
+  margin-bottom: 18px;
+}
+
+
+/* Label */
+.input-label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 500;
+  color: white;
+  font-size: 15px;
+}
+
+
+/* Input */
+.login-input {
+  width: 100%;
+  padding: 14px 16px;
+
+  border-radius: 14px;
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  background: rgba(255, 255, 255, 0.08);
+
+  color: white;
+
+  font-size: 15px;
+
+  outline: none;
+
+  transition: all 0.3s ease;
+
+  box-sizing: border-box;
+}
+
+
+/* Placeholder */
+.login-input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+
+/* Focus */
+.login-input:focus {
+  border-color: #d946ef;
+
+  background: rgba(255, 255, 255, 0.12);
+
+  box-shadow:
+    0 0 0 4px rgba(217, 70, 239, 0.15);
+}
+
+
+/* Error */
+.error-message {
+  color: #fca5a5;
+  text-align: center;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+
+/* Button */
+.login-button {
+  width: 100%;
+
+  padding: 14px;
+
+  border: none;
+
+  border-radius: 16px;
+
+  color: white;
+
+  font-size: 18px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.3s ease;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed 0%,
+      #9333ea 40%,
+      #c026d3 100%
+    );
+
+  box-shadow:
+    0 8px 20px rgba(192, 38, 211, 0.3);
+}
+
+
+/* Button Hover */
+.login-button:hover {
+  transform: translateY(-2px);
+
+  background:
+    linear-gradient(
+      135deg,
+      #6d28d9 0%,
+      #7e22ce 40%,
+      #a21caf 100%
+    );
+
+  box-shadow:
+    0 10px 25px rgba(192, 38, 211, 0.45);
+}
+
+
+/* Footer */
+.footer-text {
+  text-align: center;
+  margin-top: 22px;
+
+  color: rgba(255, 255, 255, 0.7);
+
+  font-size: 14px;
+}
+
+
+/* Signup/Login Link */
+.signup-link {
+  color: #f9a8d4;
+
+  cursor: pointer;
+
+  font-weight: 500;
+
+  transition: 0.3s;
+}
+
+
+.signup-link:hover {
+  color: white;
+  text-decoration: underline;
+}
+
+
+/* Password Wrapper */
+.password-wrapper {
+  position: relative;
+}
+
+
+/* Eye Button */
+.eye-button {
+  position: absolute;
+
+  right: 14px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  border: none;
+  background: none;
+
+  cursor: pointer;
+
+  color: rgba(255, 255, 255, 0.6);
+
+  font-size: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: 0.3s;
+}
+
+
+/* Eye Hover */
+.eye-button:hover {
+  color: white;
+}
+.text-blue-600 {
+    color: lab(62 40.48 -22.03);
+}
