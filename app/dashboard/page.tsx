@@ -380,6 +380,17 @@ export default function DashboardPage() {
     }
   };
 
+  // ── 🌟 NEW: Safe Structural Declarations Area ──
+  const handleLogout = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    showToast('Logged Out', 'Your session has been securely closed.', 'success');
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 1000);
+  };
+
   const conversionRate = leads.length > 0 ? Math.round((counts.CONVERTED / leads.length) * 100) : 0;
 
   return (
@@ -465,11 +476,16 @@ export default function DashboardPage() {
           </nav>
         </div>
 
+        {/* ── 🌟 UPDATED Logout Button trigger layout ── */}
         <div className="p-4 border-t border-slate-800 bg-slate-950/40 space-y-1.5 flex-shrink-0">
-          <Link href="/" className="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-rose-400 hover:bg-rose-950/20 rounded-xl transition-all duration-150 text-sm font-semibold border border-transparent hover:border-rose-900/30">
+          <button 
+            type="button" 
+            onClick={handleLogout} 
+            className="w-full flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-rose-400 hover:bg-rose-950/20 rounded-xl transition-all duration-150 text-sm font-semibold border border-transparent hover:border-rose-900/30 text-left"
+          >
             <LogOut className="w-4 h-4" />
             <span>Log Out</span>
-          </Link>
+          </button>
         </div>
       </aside>
 
@@ -768,7 +784,7 @@ export default function DashboardPage() {
                   }`} 
                 />
                 {formFieldErrors.name && (
-                  <p className="text-[11px] text-rose-500 font-medium ml-0.5 flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                  <p className="text-[11px] text-rose-400 font-medium ml-0.5 flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-150">
                     <AlertCircle className="w-3 h-3" /> {formFieldErrors.name}
                   </p>
                 )}
@@ -791,7 +807,7 @@ export default function DashboardPage() {
                   }`} 
                 />
                 {formFieldErrors.email && (
-                  <p className="text-[11px] text-rose-500 font-medium ml-0.5 flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                  <p className="text-[11px] text-rose-400 font-medium ml-0.5 flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-150">
                     <AlertCircle className="w-3 h-3" /> {formFieldErrors.email}
                   </p>
                 )}
@@ -814,7 +830,7 @@ export default function DashboardPage() {
                   }`} 
                 />
                 {formFieldErrors.phone && (
-                  <p className="text-[11px] text-rose-500 font-medium ml-0.5 flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                  <p className="text-[11px] text-rose-400 font-medium ml-0.5 flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-150">
                     <AlertCircle className="w-3 h-3" /> {formFieldErrors.phone}
                   </p>
                 )}
@@ -909,6 +925,7 @@ export default function DashboardPage() {
           </form>
         </div>
       )}
+
 
       {/* Delete Lead Confirmation Modal */}
       {isDeleteModalOpen && leadToDelete && (
