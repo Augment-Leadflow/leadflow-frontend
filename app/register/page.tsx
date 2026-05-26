@@ -22,6 +22,16 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  // ── 🌟 NEW: Field-specific errors state ──
+  const [fieldErrors, setFieldErrors] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: '',
+  });
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -30,12 +40,70 @@ export default function RegisterPage() {
     confirmPassword: '',
   });
 
+  // ── 🌟 NEW: Client-side validation function before API call ──
+  const validateForm = () => {
+    let isValid = true;
+    const errors = { name: '', email: '', phone: '', password: '', confirmPassword: '' };
+
+    // 1. Name Check
+    if (!formData.name.trim()) {
+      errors.name = 'Full name is required';
+      isValid = false;
+    } else if (formData.name.trim().length < 3) {
+      errors.name = 'Name must be at least 3 characters long';
+      isValid = false;
+    }
+
+    // 2. Email Format Check
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email) {
+      errors.email = 'Email address is required';
+      isValid = false;
+    } else if (!emailRegex.test(formData.email)) {
+      errors.email = 'Please enter a valid business email';
+      isValid = false;
+    }
+
+    // 3. Phone Number Check (10 Digits Standard)
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!formData.phone) {
+      errors.phone = 'Phone number is required';
+      isValid = false;
+    } else if (!phoneRegex.test(formData.phone.replace(/[\s-]/g, ''))) {
+      errors.phone = 'Please enter a valid 10-digit mobile number';
+      isValid = false;
+    }
+
+    // 4. Password Length Check (Matches your input placeholder "Min. 8 chars")
+    if (!formData.password) {
+      errors.password = 'Password is required';
+      isValid = false;
+    } else if (formData.password.length < 8) {
+      errors.password = 'Password must be at least 8 characters long';
+      isValid = false;
+    }
+
+    // 5. Confirm Password Check
+    if (!formData.confirmPassword) {
+      errors.confirmPassword = 'Please repeat your password';
+      isValid = false;
+    } else if (formData.password !== formData.confirmPassword) {
+      errors.confirmPassword = 'Passwords do not match';
+      isValid = false;
+    }
+
+    setFieldErrors(errors);
+    return isValid;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    // Clear previous warnings
+    setFieldErrors({ name: '', email: '', phone: '', password: '', confirmPassword: '' });
     
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match!");
+    // ── 🌟 NEW: Trigger Frontend Checks ──
+    if (!validateForm()) {
       return;
     }
     
@@ -53,7 +121,21 @@ export default function RegisterPage() {
       if (response.ok) {
         router.push('/login');
       } else {
-        setError(data.message || 'Registration failed');
+        // ── 🌟 NEW: Map Backend Response Validation to exact fields ──
+        const serverMessage = data.message || '';
+        const lowerMessage = serverMessage.toLowerCase();
+
+        if (lowerMessage.includes('email') || lowerMessage.includes('already exists')) {
+          setFieldErrors(prev => ({ ...prev, email: serverMessage }));
+        } else if (lowerMessage.includes('phone') || lowerMessage.includes('mobile')) {
+          setFieldErrors(prev => ({ ...prev, phone: serverMessage }));
+        } else if (lowerMessage.includes('name')) {
+          setFieldErrors(prev => ({ ...prev, name: serverMessage }));
+        } else if (lowerMessage.includes('password')) {
+          setFieldErrors(prev => ({ ...prev, password: serverMessage }));
+        } else {
+          setError(serverMessage || 'Registration failed');
+        }
       }
     } catch {
       setError('Connection failed. Is the backend running?');
@@ -65,11 +147,11 @@ export default function RegisterPage() {
   return (
     <div className="h-screen w-full flex items-center justify-center bg-[#faf9f6] text-slate-800 antialiased font-sans relative overflow-hidden">
       
-      {/* ── 🌅 Fluid Tech Background Flares (Matches Home Page) ── */}
+      {/* ── 🌅 Fluid Tech Background Flares ── */}
       <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-indigo-300/20 to-purple-400/10 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-pink-300/20 to-purple-400/20 blur-[140px] pointer-events-none" />
 
-      {/* Grid Overlay lines matching home layout */}
+      {/* Grid Overlay lines */}
       <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{
         backgroundImage: 'linear-gradient(rgba(15, 23, 42, 1) 1px, transparent 1px), linear-gradient(90deg, rgba(15, 23, 42, 1) 1px, transparent 1px)',
         backgroundSize: '60px 60px',
@@ -109,11 +191,10 @@ export default function RegisterPage() {
         {/* Action Header */}
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Create Account</h1>
-          <p className="text-slate-500 text-sm mt-1">Get instant pipeline access</p>
         </div>
 
-        {/* Form Fields Mapping Layout */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Form Fields Layout */}
+        <form onSubmit={handleSubmit} className="space-y-3">
           
           {/* Full Name */}
           <div className="space-y-1">
@@ -125,10 +206,22 @@ export default function RegisterPage() {
                 required
                 placeholder="Enter your name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all duration-150"
+                onChange={(e) => {
+                  setFormData({ ...formData, name: e.target.value });
+                  if (fieldErrors.name) setFieldErrors(prev => ({ ...prev, name: '' }));
+                }}
+                className={`w-full pl-10 pr-4 py-2.5 bg-slate-50 border rounded-xl text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 transition-all duration-150 ${
+                  fieldErrors.name 
+                    ? 'border-rose-400 focus:ring-rose-500/20 focus:border-rose-500' 
+                    : 'border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-500/50'
+                }`}
               />
             </div>
+            {fieldErrors.name && (
+              <p className="text-[11px] text-rose-500 font-medium ml-1 flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                <AlertCircle className="w-3 h-3" /> {fieldErrors.name}
+              </p>
+            )}
           </div>
 
           {/* Email Address */}
@@ -141,10 +234,22 @@ export default function RegisterPage() {
                 required
                 placeholder="you@company.com"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all duration-150"
+                onChange={(e) => {
+                  setFormData({ ...formData, email: e.target.value });
+                  if (fieldErrors.email) setFieldErrors(prev => ({ ...prev, email: '' }));
+                }}
+                className={`w-full pl-10 pr-4 py-2.5 bg-slate-50 border rounded-xl text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 transition-all duration-150 ${
+                  fieldErrors.email 
+                    ? 'border-rose-400 focus:ring-rose-500/20 focus:border-rose-500' 
+                    : 'border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-500/50'
+                }`}
               />
             </div>
+            {fieldErrors.email && (
+              <p className="text-[11px] text-rose-500 font-medium ml-1 flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                <AlertCircle className="w-3 h-3" /> {fieldErrors.email}
+              </p>
+            )}
           </div>
 
           {/* Phone Number */}
@@ -157,14 +262,27 @@ export default function RegisterPage() {
                 required
                 placeholder="Mobile number"
                 value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all duration-150"
+                onChange={(e) => {
+                  setFormData({ ...formData, phone: e.target.value });
+                  if (fieldErrors.phone) setFieldErrors(prev => ({ ...prev, phone: '' }));
+                }}
+                className={`w-full pl-10 pr-4 py-2.5 bg-slate-50 border rounded-xl text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 transition-all duration-150 ${
+                  fieldErrors.phone 
+                    ? 'border-rose-400 focus:ring-rose-500/20 focus:border-rose-500' 
+                    : 'border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-500/50'
+                }`}
               />
             </div>
+            {fieldErrors.phone && (
+              <p className="text-[11px] text-rose-500 font-medium ml-1 flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                <AlertCircle className="w-3 h-3" /> {fieldErrors.phone}
+              </p>
+            )}
           </div>
 
           {/* Passwords Inline Matrix Layout */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Password Field */}
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-500 tracking-wide uppercase ml-0.5">Password</label>
               <div className="relative">
@@ -174,8 +292,15 @@ export default function RegisterPage() {
                   required
                   placeholder="Min. 8 chars"
                   value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-880 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all duration-150"
+                  onChange={(e) => {
+                    setFormData({ ...formData, password: e.target.value });
+                    if (fieldErrors.password) setFieldErrors(prev => ({ ...prev, password: '' }));
+                  }}
+                  className={`w-full pl-10 pr-10 py-2.5 bg-slate-50 border rounded-xl text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 transition-all duration-150 ${
+                    fieldErrors.password 
+                      ? 'border-rose-400 focus:ring-rose-500/20 focus:border-rose-500' 
+                      : 'border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-500/50'
+                  }`}
                 />
                 <button
                   type="button"
@@ -185,7 +310,14 @@ export default function RegisterPage() {
                   {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                 </button>
               </div>
+              {fieldErrors.password && (
+                <p className="text-[11px] text-rose-500 font-medium ml-1 flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                  <AlertCircle className="w-3 h-3" /> {fieldErrors.password}
+                </p>
+              )}
             </div>
+
+            {/* Confirm Password Field */}
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-500 tracking-wide uppercase ml-0.5">Confirm</label>
               <div className="relative">
@@ -195,10 +327,22 @@ export default function RegisterPage() {
                   required
                   placeholder="Repeat"
                   value={formData.confirmPassword}
-                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all duration-150"
+                  onChange={(e) => {
+                    setFormData({ ...formData, confirmPassword: e.target.value });
+                    if (fieldErrors.confirmPassword) setFieldErrors(prev => ({ ...prev, confirmPassword: '' }));
+                  }}
+                  className={`w-full pl-10 pr-4 py-2.5 bg-slate-50 border rounded-xl text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 transition-all duration-150 ${
+                    fieldErrors.confirmPassword 
+                      ? 'border-rose-400 focus:ring-rose-500/20 focus:border-rose-500' 
+                      : 'border-slate-200 focus:ring-indigo-500/20 focus:border-indigo-500/50'
+                  }`}
                 />
               </div>
+              {fieldErrors.confirmPassword && (
+                <p className="text-[11px] text-rose-500 font-medium ml-1 flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                  <AlertCircle className="w-3 h-3" /> {fieldErrors.confirmPassword}
+                </p>
+              )}
             </div>
           </div>
 
@@ -227,7 +371,6 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        {/* Back Home Anchor */}
         <div className="mt-6 pt-4 border-t border-slate-100 text-center">
           <Link href="/" className="inline-flex items-center gap-1.5 text-slate-500 hover:text-indigo-600 text-xs font-semibold uppercase tracking-wider transition-colors group">
             <ArrowLeft className="w-3 h-3 group-hover:-translate-x-0.5 transition-transform" /> Back to website
