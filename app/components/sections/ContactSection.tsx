@@ -12,34 +12,43 @@ const contactInfo = [
 export function ContactSection() {
   const [loading, setLoading] = useState(false);
   const [showThankYou, setShowThankYou] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   
-  // Controlled state hooks to clear the inputs gracefully
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [company, setCompany] = useState('');
   const [message, setMessage] = useState('');
-  const [redirectUrl, setRedirectUrl] = useState('');
 
-  // Dynamically configure local navigation mapping on the client side
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setRedirectUrl(`${window.location.origin}${window.location.pathname}?submitted=true`);
-    }
-
-    // Monitor search query parameters for a thank-you flag trigger
-    const queryParams = new URLSearchParams(window.location.search);
-    if (queryParams.get('submitted') === 'true') {
-      setShowThankYou(true);
-      
-      // Clean query trails out of the browser history address bar
-      const cleanUrl = window.location.pathname;
-      window.history.replaceState({}, document.title, cleanUrl);
-    }
-  }, []);
-
-  const handleFormSubmission = () => {
+  const handleFormSubmission = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
+    setErrorMessage('');
+
+    try {
+      // सीधा हमारे अपने लोकल /api/contact एंडपॉइंट पर डेटा भेज रहे हैं
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, company, message }),
+      });
+
+      if (response.ok) {
+        setShowThankYou(true);
+        // फ़ॉर्म को तुरंत साफ़ (Reset) करें
+        setName('');
+        setEmail('');
+        setPhone('');
+        setCompany('');
+        setMessage('');
+      } else {
+        setErrorMessage('Submission failed. Please try again later.');
+      }
+    } catch (err) {
+      setErrorMessage('Network error. Check your connection.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -100,54 +109,45 @@ export function ContactSection() {
 
           {/* Right — form */}
           <div className="lg:col-span-3">
-            <form 
-              id="leadflow-contact-form"
-              action="https://formsubmit.co/yogeshhammad949@gmail.com" 
-              method="POST"
-              onSubmit={handleFormSubmission}
-              className="bg-slate-50 rounded-3xl p-8 border border-slate-100 space-y-5"
-            >
-              {/* FormSubmit Core Template Variables */}
-              <input type="hidden" name="_template" value="table" />
-              <input type="hidden" name="_subject" value="🚨 New LeadFlow Contact Form Submission" />
-              <input type="hidden" name="_captcha" value="false" />
-              {/* Tells the server where to route back to keep users locally on site */}
-              <input type="hidden" name="_next" value={redirectUrl} />
+            <form onSubmit={handleFormSubmission} className="bg-slate-50 rounded-3xl p-8 border border-slate-100 space-y-5">
               
+              {errorMessage && (
+                <div className="p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-xl text-xs font-semibold flex items-center justify-between">
+                  <span>{errorMessage}</span>
+                  <X className="w-4 h-4 cursor-pointer text-rose-400" onClick={() => setErrorMessage('')} />
+                </div>
+              )}
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="space-y-1.5">
                   <label className="text-sm font-bold text-slate-700">Full Name *</label>
                   <input
-                    type="text" name="Sender Name" required
+                    type="text" required
                     value={name} onChange={(e) => setName(e.target.value)}
-                    placeholder=""
                     className="w-full p-3.5 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-slate-700 text-sm"
                   />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-bold text-slate-700">Email *</label>
                   <input
-                    type="email" name="Email ID" required
+                    type="email" required
                     value={email} onChange={(e) => setEmail(e.target.value)}
-                    placeholder=""
                     className="w-full p-3.5 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-slate-700 text-sm"
                   />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-bold text-slate-700">Phone Number</label>
                   <input
-                    type="tel" name="Contact Phone"
+                    type="tel"
                     value={phone} onChange={(e) => setPhone(e.target.value)}
-                    placeholder=""
                     className="w-full p-3.5 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-slate-700 text-sm"
                   />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-bold text-slate-700">Business Requirements</label>
                   <input
-                    type="text" name="Company Name"
+                    type="text"
                     value={company} onChange={(e) => setCompany(e.target.value)}
-                    placeholder=""
                     className="w-full p-3.5 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-slate-700 text-sm"
                   />
                 </div>
@@ -155,9 +155,8 @@ export function ContactSection() {
               <div className="space-y-1.5">
                 <label className="text-sm font-bold text-slate-700">Message *</label>
                 <textarea
-                  name="Inquiry Details" required
+                  required
                   value={message} onChange={(e) => setMessage(e.target.value)}
-                  placeholder=" "
                   rows={4}
                   className="w-full p-3.5 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-slate-700 text-sm resize-none"
                 />
@@ -168,10 +167,7 @@ export function ContactSection() {
                 className="w-full py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-70"
               >
                 {loading ? (
-                  <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
                   <Send className="w-5 h-5" />
                 )}
@@ -182,10 +178,10 @@ export function ContactSection() {
         </div>
       </div>
 
-      {/* ── 🎉 Professional Centered Thank You Modal ── */}
+      {/* 🎉 Centered Thank You Modal */}
       {showThankYou && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 border border-slate-100 text-center animate-fade-in relative">
+          <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 border border-slate-100 text-center relative">
             <button
               onClick={() => setShowThankYou(false)}
               className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
@@ -203,11 +199,6 @@ export function ContactSection() {
             <p className="text-slate-500 text-sm mt-4 leading-relaxed">
               Your inquiry has been processed and formatted into a structured summary layout. A copy has been routed directly to <span className="font-semibold text-slate-800">yogeshhammad949@gmail.com</span>.
             </p>
-
-            <div className="mt-6 p-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs text-left space-y-1.5 text-slate-500">
-              <p>• Response ETA: <span className="font-semibold text-slate-700">Within 24 hours</span></p>
-              <p>• Format: <span className="font-semibold text-slate-700">Clean Tabular Layout Data</span></p>
-            </div>
 
             <button
               type="button"
