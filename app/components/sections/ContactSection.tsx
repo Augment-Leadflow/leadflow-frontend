@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import { Mail, Phone, MapPin, Send, CheckCircle2, X } from 'lucide-react';
 
 const contactInfo = [
-  { icon: Mail,    label: 'Email Us',       value: 'yogeshhammad949@gmail.com', href: 'mailto:yogeshhammad949@gmail.com' },
-  { icon: Phone,   label: 'Call Us',        value: '+1 (555) 123-4567',       href: 'tel:+15551234567'          },
-  { icon: MapPin,  label: 'Visit Us',       value: '450 Mission St, SF, CA',  href: '#'                         },
+  { icon: Mail,    label: 'Email Us',       value: 'leadflow.officiall@gmail.com', href: 'mailto:leadflow.officiall@gmail.com' },
+  { icon: Phone,   label: 'Call Us',        value: '9876543210',       href: 'tel:+87654234'          },
+  { icon: MapPin,  label: 'Visit Us',       value: 'Indore, Madhya Pradesh',  href: '#'                         },
 ];
 
 export function ContactSection() {
@@ -34,7 +34,6 @@ export function ContactSection() {
 
       if (response.ok) {
         setShowThankYou(true);
-        // फ़ॉर्म को तुरंत साफ़ (Reset) करें
         setName('');
         setEmail('');
         setPhone('');
@@ -177,7 +176,7 @@ export function ContactSection() {
         </div>
       </div>
 
-      {/* 🎉 Centered Thank You Modal */}
+      {/* Centered Thank You Modal */}
       {showThankYou && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 border border-slate-100 text-center relative">
