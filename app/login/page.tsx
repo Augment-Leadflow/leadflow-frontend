@@ -10,12 +10,9 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  
-  // ── 🌟 NEW: Field-specific errors state ──
   const [fieldErrors, setFieldErrors] = useState({ email: '', password: '' });
   const [formData, setFormData] = useState({ email: '', password: '' });
 
-  // ── 🌟 NEW: Client-side validation function before API call ──
   const validateForm = () => {
     let isValid = true;
     const errors = { email: '', password: '' };
@@ -47,13 +44,10 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-    // Clear previous field errors on new submit
     setFieldErrors({ email: '', password: '' });
-
-    // ── 🌟 NEW: Trigger Validation Check ──
     if (!validateForm()) {
       setIsLoading(false);
-      return; // Stop execution if client-side validation fails
+      return; 
     }
 
     try {
@@ -72,10 +66,8 @@ export default function LoginPage() {
         localStorage.setItem('user', JSON.stringify(data));
         router.push('/dashboard');
       } else {
-        // ── 🌟 NEW: Map Backend validation messages to respective fields ──
         const serverMessage = data.message || '';
-        
-        if (serverMessage.toLowerCase().includes('email') || serverMessage.toLowerCase().includes('user not found')) {
+         if (serverMessage.toLowerCase().includes('email') || serverMessage.toLowerCase().includes('user not found')) {
           setFieldErrors(prev => ({ ...prev, email: serverMessage }));
         } else if (serverMessage.toLowerCase().includes('password') || serverMessage.toLowerCase().includes('credential')) {
           setFieldErrors(prev => ({ ...prev, password: serverMessage }));
