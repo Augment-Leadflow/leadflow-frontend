@@ -37,7 +37,6 @@ const features = [
 ];
 
 export function Footer() {
-  // ── 🌟 NEW: Interactive Coming Soon Micro-Toast State ──
   const [toast, setToast] = useState({ show: false, label: "" });
 
   const triggerToast = (label: string) => {
@@ -56,7 +55,6 @@ export function Footer() {
         const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
         window.scrollTo({ top: offsetPosition, behavior: "smooth" });
       } else {
-        // Fallback agar landing page ke id sections abhi register nahi hue hain
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
     }
@@ -64,7 +62,6 @@ export function Footer() {
 
   return (
     <>
-      {/* ── 🌟 NEW: Dynamic Floating Coming Soon Micro-Toast Notice ── */}
       {toast.show && (
         <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 bg-slate-900 border border-slate-800 text-white px-4 py-3 rounded-xl shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-200">
           <AlertCircle className="w-4 h-4 text-indigo-400" />
@@ -72,7 +69,6 @@ export function Footer() {
         </div>
       )}
 
-      {/* ── 🚀 Action Value Callout Banner ── */}
       <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white py-16 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute -top-40 -left-20 w-96 h-96 bg-white rounded-full blur-3xl"></div>
@@ -245,8 +241,6 @@ export function Footer() {
               </a>
             </div>
           </div>
-
-          {/* ── 🌟 NEW: Legal Terms Inline Row ── */}
           <div className="mt-4 pt-4 border-t border-slate-900/40 flex flex-wrap justify-center gap-x-6 gap-y-2 text-[11px] text-slate-600 font-medium uppercase tracking-wide">
             <button onClick={() => triggerToast("Privacy Policy")} className="hover:text-slate-400 transition-colors">Privacy Policy</button>
             <button onClick={() => triggerToast("Terms of Service")} className="hover:text-slate-400 transition-colors">Terms of Service</button>
