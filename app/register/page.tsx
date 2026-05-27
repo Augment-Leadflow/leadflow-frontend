@@ -22,8 +22,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  
-  // ── 🌟 NEW: Field-specific errors state ──
+
   const [fieldErrors, setFieldErrors] = useState({
     name: '',
     email: '',
@@ -40,7 +39,7 @@ export default function RegisterPage() {
     confirmPassword: '',
   });
 
-  // ── 🌟 NEW: Client-side validation function before API call ──
+ 
   const validateForm = () => {
     let isValid = true;
     const errors = { name: '', email: '', phone: '', password: '', confirmPassword: '' };
@@ -101,8 +100,7 @@ export default function RegisterPage() {
     setError('');
     // Clear previous warnings
     setFieldErrors({ name: '', email: '', phone: '', password: '', confirmPassword: '' });
-    
-    // ── 🌟 NEW: Trigger Frontend Checks ──
+ 
     if (!validateForm()) {
       return;
     }
@@ -121,7 +119,6 @@ export default function RegisterPage() {
       if (response.ok) {
         router.push('/login');
       } else {
-        // ── 🌟 NEW: Map Backend Response Validation to exact fields ──
         const serverMessage = data.message || '';
         const lowerMessage = serverMessage.toLowerCase();
 
