@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { noteService } from '../services/noteService';
 
 interface Note {
-    id: string;
+    // id: string;
+    id: string | number;
+
     content: string;
     // createdAt: string;
     createdAt?: string;
