@@ -1,14 +1,3 @@
-// ============================================================
-// LEADFLOW — MOCK DATA LAYER
-// ============================================================
-// This file contains all demo/hardcoded data for development.
-//
-// BACKEND INTEGRATION GUIDE:
-//  - Replace MOCK_LEADS with API calls from services/apiService.ts
-//  - Replace other constants with API endpoints as needed
-//  - See services/apiService.ts for the full integration structure
-// ============================================================
-
 export type LeadStatus = 'NEW' | 'CONTACTED' | 'CONVERTED' | 'LOST';
 
 export interface Lead {
@@ -22,8 +11,6 @@ export interface Lead {
   createdAt: string;
 }
 
-// ── Demo Leads ────────────────────────────────────────────────
-// REPLACE: LeadAPI.getAll() from services/apiService.ts
 export const MOCK_LEADS: Lead[] = [
   {
     id: '1',
