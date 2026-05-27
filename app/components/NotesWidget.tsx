@@ -4,7 +4,8 @@ import { noteService } from '../services/noteService';
 interface Note {
     id: string;
     content: string;
-    createdAt: string;
+    // createdAt: string;
+    createdAt?: string;
 }
 
 export const NotesWidget: React.FC = () => {
