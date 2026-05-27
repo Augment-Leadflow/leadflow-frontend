@@ -146,7 +146,7 @@ export function Footer() {
                 </a>
                 <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-slate-900 border border-white/5 hover:bg-[#E1306C] hover:border-transparent rounded-xl flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 text-slate-400 hover:text-white" aria-label="Instagram">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                    <rect x="2" y="2" width="20" h="20" rx="5" ry="5" />
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
                     <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
                     <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
                   </svg>
