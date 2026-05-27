@@ -26,7 +26,6 @@ export function ContactSection() {
     setErrorMessage('');
 
     try {
-      // सीधा हमारे अपने लोकल /api/contact एंडपॉइंट पर डेटा भेज रहे हैं
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
