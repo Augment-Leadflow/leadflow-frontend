@@ -1,146 +1,3 @@
-// const BASE_URL =
-//   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
-
-// const USE_DEMO_MODE = false;
-
-// interface FetchOptions {
-//   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-//   body?: unknown;
-//   headers?: Record<string, string>;
-// }
-
-// async function fetchAPI<T>(endpoint: string, options: FetchOptions = {}): Promise<T> {
-//   const { method = 'GET', body, headers = {} } = options;
-
-//   const token = typeof window !== 'undefined'
-//     ? localStorage.getItem('token')
-//     : null;
-
-//   const config: RequestInit = {
-//     method,
-//     headers: {
-//       'Content-Type': 'application/json',
-//       ...(token ? { Authorization: `Bearer ${token}` } : {}), // ✅ FIXED: Backticks added
-//       ...headers,
-//     },
-//     ...(body ? { body: JSON.stringify(body) } : {}),
-//   };
-
-//   console.log(`Sending ${method} request to: ${BASE_URL}${endpoint}`); // ✅ FIXED: Backticks added
-
-//   const response = await fetch(`${BASE_URL}${endpoint}`, config);
-//   console.log("Backend Message Response Status:", response.status, response.statusText);
-
-//   if (!response.ok) {
-//     const errorData = await response.json().catch(() => ({}));
-//     throw new Error(
-//       (errorData as { message?: string }).message ||
-//       `Request failed: ${response.status} ${response.statusText}` // ✅ FIXED: Backticks added
-//     );
-//   }
-
-//   if (response.status === 204) return undefined as T;
-
-//   return response.json() as Promise<T>;
-// }
-
-// export interface LeadDTO {
-//   id?: string;
-//   name: string;
-//   phone: string;
-//   email: string;
-//   source: string;
-//   status: 'NEW' | 'CONTACTED' | 'CONVERTED' | 'LOST';
-//   notes: string;
-//   createdAt?: string;
-//   telegramChatId?: string;
-// }
-
-// export interface AuthCredentials {
-//   email: string;
-//   password: string;
-// }
-
-// export interface RegisterData {
-//   name: string;
-//   email: string;
-//   password: string;
-// }
-
-// export interface AuthResponse {
-//   token: string;
-//   role: string;
-// }
-
-// // ── Lead API ──────────────────────────────────────────────────
-// export const LeadAPI = {
-//   getAll: () =>
-//     fetchAPI<LeadDTO[]>('/leads'),
-
-//   getById: (id: string) =>
-//     fetchAPI<LeadDTO>(`/leads/${id}`), // ✅ FIXED: Backticks added
-
-//   create: (data: Omit<LeadDTO, 'id' | 'createdAt'>) =>
-//     fetchAPI<LeadDTO>('/leads', { method: 'POST', body: data }),
-
-//   update: (id: string, data: Partial<LeadDTO>) =>
-//     fetchAPI<LeadDTO>(`/leads/${id}`, { method: 'PUT', body: data }), // ✅ FIXED: Backticks added
-
-//   delete: (id: string) =>
-//     fetchAPI<void>(`/leads/${id}`, { method: 'DELETE' }), // ✅ FIXED: Backticks added
-// };
-
-// // ── Auth API ──────────────────────────────────────────────────
-// export const AuthAPI = {
-//   login: (credentials: AuthCredentials) =>
-//     fetchAPI<AuthResponse>('/auth/login', {
-//       method: 'POST',
-//       body: credentials,
-//     }),
-
-//   register: (data: RegisterData) =>
-//     fetchAPI<AuthResponse>('/auth/register', {
-//       method: 'POST',
-//       body: data,
-//     }),
-
-//   logout: () =>
-//     fetchAPI<void>('/auth/logout', { method: 'POST' }),
-// };
-
-// // ── Email Notification API ───────────────────────────────────
-// export const EmailAPI = {
-//   send: (data: { email: string; name: string; type: string }) =>
-//     fetchAPI('/email/send', { 
-//       method: 'POST', 
-//       body: data 
-//     }),
-// };
-
-// export const TelegramAPI = {
-//   send: (data: { 
-//     name: string; 
-//     phone: string; 
-//     source: string; 
-//     type: string; 
-//     message: string; 
-//     leadChatId: string; 
-//   }) =>
-//     fetchAPI('/telegram/send', { 
-//       method: 'POST', 
-//       body: data 
-//     }),
-// };
-
-// export const TokenService = {
-//   save: (token: string) => localStorage.setItem('token', token),
-//   get: () => localStorage.getItem('token'),
-//   remove: () => localStorage.removeItem('token'),
-//   isLoggedIn: () => !!localStorage.getItem('token'),
-// };
-
-// export { USE_DEMO_MODE };
-
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
 
@@ -191,8 +48,6 @@ async function fetchAPI<T>(endpoint: string, options: FetchOptions = {}): Promis
   }
 
   if (response.status === 204) return undefined as T;
-
-  // Safe checks to support plain text responses alongside application/json types
   const contentType = response.headers.get('content-type');
   if (contentType && contentType.includes('application/json')) {
     return response.json() as Promise<T>;
@@ -229,8 +84,6 @@ export interface AuthResponse {
   token: string;
   role: string;
 }
-
-// ── Lead API ──────────────────────────────────────────────────
 export const LeadAPI = {
   getAll: () =>
     fetchAPI<LeadDTO[]>('/leads'),
@@ -248,7 +101,6 @@ export const LeadAPI = {
     fetchAPI<void>(`/leads/${id}`, { method: 'DELETE' }),
 };
 
-// ── Auth API ──────────────────────────────────────────────────
 export const AuthAPI = {
   login: (credentials: AuthCredentials) =>
     fetchAPI<AuthResponse>('/auth/login', {
@@ -266,7 +118,6 @@ export const AuthAPI = {
     fetchAPI<void>('/auth/logout', { method: 'POST' }),
 };
 
-// ── Email Notification API ───────────────────────────────────
 export const EmailAPI = {
   send: (data: { email: string; name: string; type: string }) =>
     fetchAPI('/email/send', { 
