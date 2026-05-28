@@ -195,7 +195,7 @@ export function ContactSection() {
             <p className="text-indigo-600 font-bold text-sm mt-1">Submission Successful</p>
             
             <p className="text-slate-500 text-sm mt-4 leading-relaxed">
-              Your inquiry has been processed and formatted into a structured summary layout. A copy has been routed directly to <span className="font-semibold text-slate-800">yogeshhammad949@gmail.com</span>.
+              Your inquiry has been processed and formatted into a structured summary layout. A copy has been routed directly to <span className="font-semibold text-slate-800">leadflow.officiall@gmail.com</span>.
             </p>
 
             <button
