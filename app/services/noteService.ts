@@ -1,7 +1,9 @@
 import axios from 'axios';
+
 export interface Note {
     id?: number;
     content: string;
+    createdAt?: string;
 }
 
 const getBaseUrl = () => {
