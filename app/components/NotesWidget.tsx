@@ -1,19 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { noteService } from '../services/noteService';
-
-interface Note {
-    // id: string;
-    id: string | number;
-
-    content: string;
-    // createdAt: string;
-    createdAt?: string;
-}
+import type { Note } from '../services/noteService';
 
 export const NotesWidget: React.FC = () => {
     const [notes, setNotes] = useState<Note[]>([]);
     const [newContent, setNewContent] = useState('');
-    const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+    const [editingNoteId, setEditingNoteId] = useState<number | null>(null);
     const [editingContent, setEditingContent] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -38,7 +30,7 @@ export const NotesWidget: React.FC = () => {
 
         try {
             setLoading(true);
-            const createdNote = await noteService.createNote(newContent);
+            const createdNote = await noteService.createNote({ content: newContent });
             setNotes([createdNote, ...notes]); 
             setNewContent('');
         } catch (error) {
@@ -48,11 +40,11 @@ export const NotesWidget: React.FC = () => {
         }
     };
 
-    const handleUpdate = async (id: string) => {
+    const handleUpdate = async (id: number) => {
         if (!editingContent.trim()) return;
 
         try {
-            const updatedNote = await noteService.updateNote(id, editingContent);
+            const updatedNote = await noteService.updateNote(id, { content: editingContent });
             setNotes(notes.map(n => n.id === id ? updatedNote : n));
             setEditingNoteId(null);
             setEditingContent('');
@@ -61,7 +53,7 @@ export const NotesWidget: React.FC = () => {
         }
     };
 
-    const handleDelete = async (id: string) => {
+    const handleDelete = async (id: number) => {
         if (!window.confirm("Are you sure you want to delete this note?")) return;
 
         try {
@@ -113,7 +105,7 @@ export const NotesWidget: React.FC = () => {
                                         onChange={(e) => setEditingContent(e.target.value)}
                                     />
                                     <button 
-                                        onClick={() => handleUpdate(note.id)}
+                                        onClick={() => note.id !== undefined && handleUpdate(note.id)}
                                         className="text-xs bg-emerald-500 text-white px-2 py-1 rounded-md font-medium"
                                     >
                                         Save
@@ -131,6 +123,7 @@ export const NotesWidget: React.FC = () => {
                                     <div className="flex gap-2 shrink-0">
                                         <button
                                             onClick={() => {
+                                                if (note.id === undefined) return;
                                                 setEditingNoteId(note.id);
                                                 setEditingContent(note.content);
                                             }}
@@ -139,7 +132,7 @@ export const NotesWidget: React.FC = () => {
                                             Edit
                                         </button>
                                         <button
-                                            onClick={() => handleDelete(note.id)}
+                                            onClick={() => note.id !== undefined && handleDelete(note.id)}
                                             className="text-xs text-gray-400 hover:text-red-500 transition"
                                         >
                                             Delete
@@ -148,7 +141,9 @@ export const NotesWidget: React.FC = () => {
                                 </div>
                             )}
                             <span className="text-[10px] text-gray-400 self-start">
-                                {new Date(note.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                {note.createdAt
+                                    ? new Date(note.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                                    : 'Just now'}
                             </span>
                         </div>
                     ))
