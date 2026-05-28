@@ -17,6 +17,8 @@ export const NotesWidget: React.FC = () => {
         try {
             const data = await noteService.getUserNotes();
             setNotes(data);
+            // setNotes(data as Note[]);
+
         } catch (error) {
             console.error(error);
         }
