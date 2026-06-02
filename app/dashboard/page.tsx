@@ -186,7 +186,7 @@ export default function DashboardPage() {
       }
       
       const jwtToken = localStorage.getItem('token');    
-      const response = await fetch('http://localhost:8080/api/automation/direct-whatsapp', {
+      const response = await fetch('http://https://leadflow-backend-gk39.onrender.com/api/automation/direct-whatsapp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
