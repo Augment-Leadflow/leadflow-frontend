@@ -6,13 +6,7 @@ export interface Note {
     createdAt?: string;
 }
 
-const getBaseUrl = () => {
-    const currentHost = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
-    const BACKEND_PORT = '8080'; 
-    return `http://${currentHost}:${BACKEND_PORT}/api/notes`;
-};
-
-const API_URL = getBaseUrl();
+const API_URL = 'https://leadflow-backend-gk39.onrender.com/api/notes';
 
 const getAuthHeaders = () => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null; 
