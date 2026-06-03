@@ -5,6 +5,7 @@ import { LeadAPI, TelegramAPI } from '@/app/services/apiService';
 import type { LeadDTO } from '@/app/services/apiService';
 import { noteService } from '@/app/services/noteService';
 import type { Note } from '@/app/services/noteService';
+import { useRouter } from 'next/navigation';
 import {
   Home,
   LayoutDashboard,
@@ -106,6 +107,8 @@ export default function DashboardPage() {
   const [leadToDelete, setLeadToDelete] = useState<LeadDTO | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const router = useRouter();
+
   const [notes, setNotes] = useState<Note[]>([]);
   const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
   const [notesTab, setNotesTab] = useState<'view' | 'add'>('view');
@@ -149,11 +152,15 @@ export default function DashboardPage() {
     }
   };
 
-  useEffect(() => {
+ useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        router.push('/login');
+        return;
+    }
     fetchDashboardData();
     fetchNotesData();
-  }, []);
-
+}, []);
   const filteredLeads = leads.filter((l) => {
     const isHomeSearching = filter === 'HOME' && search.trim() !== '';
     
