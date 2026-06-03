@@ -9,7 +9,7 @@ export interface Note {
 const API_URL = 'https://leadflow-backend-gk39.onrender.com/api/notes';
 
 const getAuthHeaders = () => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null; 
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     return {
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -23,17 +23,14 @@ export const noteService = {
         const response = await axios.get(API_URL, getAuthHeaders());
         return response.data;
     },
-
     createNote: async (note: Note): Promise<Note> => {
         const response = await axios.post(API_URL, note, getAuthHeaders());
         return response.data;
     },
-
     updateNote: async (id: number, note: Note): Promise<Note> => {
         const response = await axios.put(`${API_URL}/${id}`, note, getAuthHeaders());
         return response.data;
     },
-
     deleteNote: async (id: number): Promise<void> => {
         await axios.delete(`${API_URL}/${id}`, getAuthHeaders());
     }
